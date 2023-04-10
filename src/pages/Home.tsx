@@ -1,64 +1,76 @@
-import React, { useEffect } from "react";
-import SearchComp from "../components/Searchcomp";
+import React, { useEffect, useState } from "react";
+import SearchComp from "../components/SearchComp";
 import axios from "axios";
-import { useState } from "react";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
-import { addFavorites, fetchFail, getSuccessProduct } from "../features/productsSlice";
+import {
+  addFavorites,
+  fetchFail,
+  fetchStart,
+  getSuccessProduct,
+} from "../features/productsSlice";
+import { VoidFunc } from "../models/models";
+import { EventFunc, Product, Products } from "../models/models";
 import Card from "../components/Card";
+// import { toastSuccessNotify, toastWarnNotify } from "../helper/ToastNotify";
 
-export interface Product {
-  products: Product[];
-  total: number;
-  skip: number;
-  limit: number;
-}
 const Home = () => {
-  const [search, setSearch] = useState("");
-  const dispace = useAppDispatch();
-  const {loading, error,productsList,favorites}=useAppSelector(state=> state.products)
-  const url = `https://dummyjson.com/products/search?q=${search}`;
+  const [search, setSearch] = useState<string>("");
+  const dispatch = useAppDispatch();
+  const { loading, error, productsList, favorites } = useAppSelector(
+    (state) => state.products
+  );
 
   const getData = async () => {
+    dispatch(fetchStart());
     try {
-      const { data } = await axios(url);
-      dispace(getSuccessProduct(data.products));
+      const { data } = await axios.get<Products>(
+        `https://dummyjson.com/products/search?q=${search}`
+      );
+      console.log(data.products);
+      dispatch(getSuccessProduct(data.products));
     } catch (error) {
-      dispace(fetchFail());
       console.log(error);
+      dispatch(fetchFail());
     }
   };
-
+  console.log(error);
   useEffect(() => {
     getData();
   }, [search]);
 
-const handleChange=(e:React.ChangeEvent<HTMLInputElement>)=>{
-  setSearch(e.target.value)
-  setSearch("")
-}
+  const handleChange: EventFunc = (e) => {
+    setSearch(e.target.value);
+  };
 
-const handleAdd=(product:Product)=>{
-if (favorites.filter(item=> item.id===product.id).length===0){
-  dispace(addFavorites(product))
-}
-}
+  const handleAdd = (product: Product) => {
+    if (favorites.filter((item) => item.id === product.id).length === 0) {
+      dispatch(addFavorites(product));
+      toastSuccessNotify("Product added favorites!");
+    } else {
+      toastWarnNotify("Already added to favorites!");
+    }
+  };
+
   return (
     <div>
       <SearchComp handleChange={handleChange} />
       {loading ? (
-        error ? (
-          <div>
-            <p className="text-center text-red-600">Something went wrong...</p>
-          </div>
-        ) : (
-          <div>
-            <p className="text-center text-red-600">Products loading...</p>
-          </div>
-        )
+        <div className="mt-52">
+          <p className="text-center text-red-600">Products loading...</p>
+        </div>
+      ) : error ? (
+        <div className="mt-52">
+          <p className="text-center text-red-600">Something went wrong...</p>
+        </div>
       ) : (
-        <div>
+        <div className="flex justify-center items-center flex-wrap gap-5 p-5">
           {productsList.map((item) => (
-            <Card item={item} text="Add Favorites" handleFunc={handleAdd} />
+            <Card
+              key={item.id}
+              text="Add to favorites"
+              item={item}
+              handleFunc={handleAdd}
+            />
           ))}
         </div>
       )}
