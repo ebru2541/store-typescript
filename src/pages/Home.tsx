@@ -2,8 +2,9 @@ import React, { useEffect } from "react";
 import SearchComp from "../components/Searchcomp";
 import axios from "axios";
 import { useState } from "react";
-import { useAppDispatch } from "../app/hooks";
-import { fetchFail, getSuccessProduct } from "../features/productsSlice";
+import { useAppDispatch, useAppSelector } from "../app/hooks";
+import { addFavorites, fetchFail, getSuccessProduct } from "../features/productsSlice";
+import Card from "../components/Card";
 
 export interface Product {
   products: Product[];
@@ -14,6 +15,7 @@ export interface Product {
 const Home = () => {
   const [search, setSearch] = useState("");
   const dispace = useAppDispatch();
+  const {loading, error,productsList,favorites}=useAppSelector(state=> state.products)
   const url = `https://dummyjson.com/products/search?q=${search}`;
 
   const getData = async () => {
@@ -35,9 +37,31 @@ const handleChange=(e:React.ChangeEvent<HTMLInputElement>)=>{
   setSearch("")
 }
 
+const handleAdd=(product:Product)=>{
+if (favorites.filter(item=> item.id===product.id).length===0){
+  dispace(addFavorites(product))
+}
+}
   return (
     <div>
       <SearchComp handleChange={handleChange} />
+      {loading ? (
+        error ? (
+          <div>
+            <p className="text-center text-red-600">Something went wrong...</p>
+          </div>
+        ) : (
+          <div>
+            <p className="text-center text-red-600">Products loading...</p>
+          </div>
+        )
+      ) : (
+        <div>
+          {productsList.map((item) => (
+            <Card item={item} text="Add Favorites" handleFunc={handleAdd} />
+          ))}
+        </div>
+      )}
     </div>
   );
 };
