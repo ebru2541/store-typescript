@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import SearchComp from "../components/SearchComp";
+
 import axios from "axios";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import {
@@ -8,10 +8,10 @@ import {
   fetchStart,
   getSuccessProduct,
 } from "../features/productsSlice";
-import { VoidFunc } from "../models/models";
 import { EventFunc, Product, Products } from "../models/models";
 import Card from "../components/Card";
-// import { toastSuccessNotify, toastWarnNotify } from "../helper/ToastNotify";
+import { toastSuccessNotify, toastWarnNotify } from "../helper/ToastNotify";
+import SearchComp from "../components/SearchComp";
 
 const Home = () => {
   const [search, setSearch] = useState<string>("");

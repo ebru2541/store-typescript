@@ -13,7 +13,7 @@ const FavoritesPage = () => {
   };
 
   return (
-    <div>
+    <div className="flex justify-center items-center flex-wrap gap-5 p-5">
       {favorites.map((item) => (
         <Card
           key={item.id}

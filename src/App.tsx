@@ -1,10 +1,11 @@
-import React from "react";
+
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import FavoritesPage from "./pages/FavoritesPage";
 import { Navbar } from "./components/Navbar";
 import {Provider} from "react-redux"
 import { store } from "./app/store";
+import { ToastContainer } from "react-toastify";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
             <Route path="/favori" element={<FavoritesPage />} />
           </Routes>
         </BrowserRouter>
+        <ToastContainer />
       </Provider>
     </div>
   );
